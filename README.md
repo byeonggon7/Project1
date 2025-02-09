@@ -20,6 +20,9 @@
 ### __C. Implementing Networking and Security Aspects:__
 - The __domain name server__ converts user-friendly domain names into numerical IP addresses, enabling seamless website access without requiring users to remember IP addresses.
 - __HTTP/HTTPS protocols__: facilitates standard web communication, while HTTPS enhances security by encrypting data using SSL certificates.
+- Github converts website's domain name into an IP address that computers may connect to via DNS.
+- The IP address linked to the website is a hosting IP address, belonging to the server that hosts our page as well as numerous other Github pages.
+- The HTTPS protocol, which is used by the website, encrypts the messages it transmits and guarantees safe client-server communication.
 1. HTTPS is already enabled by default when setting up a page in Github.
 2. DNS is not required since I am not using a custom domain.
 3. Using nslook up https://byeonggon7.github.io/Project1/ in cmd, return the IP address: 185.199.109.153
