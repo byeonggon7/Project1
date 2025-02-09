@@ -1,42 +1,28 @@
-# __Project1__
-__Group 17__: Project 1 for Computer Networks
+# __Project Report__
 
-__Members__
+### __Student Name:__ Andy Kim   
+### __Website Link:__ https://byeonggon7.github.io/Project1/
 
-[Andy Kim]
+## __Setup Process:__
 
-__Links__
+### __A. Website Setup:__
+1. Created my project folder (to house all project files).
+2. Set up basic files: `index.html`, `styles.css` using __Notepad++__.
+3. Used __Notepad++__ to create my CSS source file for basic website styling.
 
-Website Link: https://byeonggon7.github.io/Project1/
+### __B. Choosing Hosting Service and Deployment:__
+1. Used GitHub for hosting
+2. In the repository setting, there is a build and deployment section.
+3. Selected the branch to main and pressed save.
+4. Deployed the site.
 
-Repository: https://https://github.com/byeonggon7/Project1
+### __C. Implementing Networking and Security Aspects:__
+- The __domain name server__ converts user-friendly domain names into numerical IP addresses, enabling seamless website access without requiring users to remember IP addresses.
+- __HTTP/HTTPS protocols__: facilitates standard web communication, while HTTPS enhances security by encrypting data using SSL certificates.
+1. HTTPS is already enabled by default when setting up a page in Github.
+2. DNS is not required since I am not using a custom domain.
+3. Using nslook up https://byeonggon7.github.io/Project1/ in cmd, return the IP address: 185.199.109.153
 
-__Setup Process:__
-
-Created a new GitHub repository
-
-Developed the website using HTML & CSS.
-
-Committed the HTML and CSS to the repository.
-
-Configured GitHub Pages to publish the website from the repository.
-
-__Challenges Faced:__
-
-Initially, GitHub Pages took time to load after activation.
-
-Faced minor issues with CSS formatting and file linking.
-
-DNS propagation delays when testing accessibility.
-
-__Networking Principles/Protocols Applied:__
-
-Internet Protocol (IP): 185.199.108.153
-
-HTTPS: https://yourusername.github.io/networking-project/
-
-HTTPS is already enabled when creating a website from github
-
-DNS: None
-
-DNS is only required if a custom domain is used. Since the site is accessed using GitHub’s subdomain (github.io), GitHub manages DNS automatically. No custom DNS records were configured.
+## __D. Challenges__
+1. Deployment errors during GitHub Pages setup, initially causing loading delays.
+2. Minor CSS and file path issues when linking resources.
