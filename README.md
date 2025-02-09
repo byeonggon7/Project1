@@ -1,17 +1,17 @@
-# Project1
-Group 17: Project 1 for Computer Networks
+# __Project1__
+__Group 17__: Project 1 for Computer Networks
 
-Members
+__Members__
 
 [Andy Kim]
 
-Links
+__Links__
 
 Website Link: https://byeonggon7.github.io/Project1/
 
 Repository: https://https://github.com/byeonggon7/Project1
 
-Setup Process
+__Setup Process:__
 
 Created a new GitHub repository
 
@@ -21,7 +21,7 @@ Committed the HTML and CSS to the repository.
 
 Configured GitHub Pages to publish the website from the repository.
 
-Challenges Faced
+__Challenges Faced:__
 
 Initially, GitHub Pages took time to load after activation.
 
@@ -29,7 +29,7 @@ Faced minor issues with CSS formatting and file linking.
 
 DNS propagation delays when testing accessibility.
 
-Networking Principles/Protocols Applied
+__Networking Principles/Protocols Applied:__
 
 Internet Protocol (IP): 185.199.108.153
 
