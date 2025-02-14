@@ -132,6 +132,12 @@
             document.getElementById("loginSection").style.display = "block";
         }
 
+        window.onload = function() {
+            localStorage.removeItem("authToken");  
+            document.getElementById("loginSection").style.display = "block";
+            document.getElementById("blogContent").style.display = "none";
+        };
+
         document.getElementById("signupForm").addEventListener("submit", async function(e) {
             e.preventDefault();
             const username = document.getElementById("signupUsername").value;
@@ -167,19 +173,10 @@
             document.getElementById("loginMessage").innerText = data.message;
 
             if (data.success) {
-                localStorage.setItem("authToken", data.token);
                 document.getElementById("loginSection").style.display = "none";
                 document.getElementById("blogContent").style.display = "block";
             }
         });
-
-        window.onload = function() {
-            const token = localStorage.getItem("authToken");
-            if (token) {
-                document.getElementById("loginSection").style.display = "none";
-                document.getElementById("blogContent").style.display = "block";
-            }
-        };
     </script>
 
 </body>
