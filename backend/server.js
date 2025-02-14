@@ -20,6 +20,19 @@ const loginLimiter = rateLimit({
     headers: true,
 });
 
+app.post("/signup", async (req, res) => {
+    const { username, password } = req.body;
+
+    if (users[username]) {
+        return res.status(400).json({ message: "Username already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    users[username] = { password: hashedPassword };
+
+    res.json({ success: true, message: "Account created successfully!" });
+});
+
 app.post("/login", loginLimiter, async (req, res) => {
     const { username, password } = req.body;
 
