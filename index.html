@@ -1,186 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Simple Blog</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            background: linear-gradient(to bottom, white, navy);
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
+const express = require("express");
+const rateLimit = require("express-rate-limit");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
-        header {
-            padding: 20px;
-            background: rgba(0, 0, 50, 0.8);
-        }
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-        main {
-            padding: 20px;
-        }
+const users = {};
+const SECRET_KEY = process.env.SECRET_KEY || "supersecret";
 
-        footer {
-            padding: 10px;
-            background: rgba(0, 0, 50, 0.8);
-        }
+const failedAttempts = {};
 
-        .form-container {
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            color: black;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-        }
+const loginLimiter = rateLimit({
+    windowMs: 30 * 1000,
+    max: 5,
+    message: "Too many login attempts. Try again in 30 seconds.",
+    headers: true,
+});
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+app.post("/signup", async (req, res) => {
+    const { username, password } = req.body;
 
-        button {
-            background-color: navy;
-            color: white;
-            padding: 10px;
-            width: 100%;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
+    if (users[username]) {
+        return res.status(400).json({ message: "Username already exists" });
+    }
 
-        button:hover {
-            background-color: darkblue;
-        }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    users[username] = { password: hashedPassword };
 
-        .blog-container {
-            display: none;
-        }
+    res.json({ success: true, message: "Account created successfully!" });
+});
 
-        .link {
-            margin-top: 10px;
-            color: navy;
-            cursor: pointer;
-        }
+app.post("/login", loginLimiter, async (req, res) => {
+    const { username, password } = req.body;
 
-        .link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
+    if (!failedAttempts[username]) {
+        failedAttempts[username] = { count: 0, lastAttempt: Date.now() };
+    }
 
-    <header>
-        <h1>Andy's Blog</h1>
-        <p>Welcome to my personal blog!</p>
-    </header>
+    if (failedAttempts[username].count >= 5 && Date.now() - failedAttempts[username].lastAttempt < 30000) {
+        return res.status(429).json({ message: "Too many login attempts. Try again in 30 seconds." });
+    }
 
-    <main>
-        <div id="loginSection" class="form-container">
-            <h2>Login</h2>
-            <form id="loginForm">
-                <input type="text" id="loginUsername" placeholder="Username" required>
-                <input type="password" id="loginPassword" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-            <p id="loginMessage"></p>
-            <p class="link" onclick="showSignup()">Don't have an account? Sign up here</p>
-        </div>
+    if (!users[username]) {
+        failedAttempts[username].count += 1;
+        failedAttempts[username].lastAttempt = Date.now();
+        return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-        <div id="signupSection" class="form-container" style="display: none;">
-            <h2>Sign Up</h2>
-            <form id="signupForm">
-                <input type="text" id="signupUsername" placeholder="Username" required>
-                <input type="password" id="signupPassword" placeholder="Password" required>
-                <button type="submit">Sign Up</button>
-            </form>
-            <p id="signupMessage"></p>
-            <p class="link" onclick="showLogin()">Already have an account? Log in here</p>
-        </div>
+    const validPassword = await bcrypt.compare(password, users[username].password);
+    if (!validPassword) {
+        failedAttempts[username].count += 1;
+        failedAttempts[username].lastAttempt = Date.now();
+        return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-        <div id="blogContent" class="blog-container">
-            <article>
-                <h2>This is My First Post!</h2>
-                <p>Posted on <strong>February 9, 2025</strong></p>
-                <p>Hello world! This is my first blog post. I'll be sharing my journey and thoughts here.</p>
-            </article>
-        </div>
-    </main>
+    failedAttempts[username].count = 0;
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
+    res.json({ success: true, message: "Login successful", token });
+});
 
-    <footer>
-        <p>© 2025 My Blog | All rights reserved.</p>
-    </footer>
+app.get("/", (req, res) => {
+    res.send("Backend is running!");
+});
 
-    <script>
-        const backendUrl = "https://project1-qahh.onrender.com";
-
-        function showSignup() {
-            document.getElementById("loginSection").style.display = "none";
-            document.getElementById("signupSection").style.display = "block";
-        }
-
-        function showLogin() {
-            document.getElementById("signupSection").style.display = "none";
-            document.getElementById("loginSection").style.display = "block";
-        }
-
-        document.getElementById("signupForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const username = document.getElementById("signupUsername").value;
-            const password = document.getElementById("signupPassword").value;
-            
-            const response = await fetch(`${backendUrl}/signup`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
-            });
-
-            const data = await response.json();
-            document.getElementById("signupMessage").innerText = data.message;
-
-            if (data.success) {
-                alert("Account created! Please log in.");
-                showLogin();
-            }
-        });
-
-        document.getElementById("loginForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const username = document.getElementById("loginUsername").value;
-            const password = document.getElementById("loginPassword").value;
-            
-            const response = await fetch(`${backendUrl}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
-            });
-
-            const data = await response.json();
-            document.getElementById("loginMessage").innerText = data.message;
-
-            if (data.success) {
-                localStorage.setItem("authToken", data.token);
-                document.getElementById("loginSection").style.display = "none";
-                document.getElementById("blogContent").style.display = "block";
-            }
-        });
-
-        window.onload = function() {
-            const token = localStorage.getItem("authToken");
-            if (token) {
-                document.getElementById("loginSection").style.display = "none";
-                document.getElementById("blogContent").style.display = "block";
-            }
-        };
-    </script>
-
-</body>
-</html>
+app.listen(5000, () => console.log("Server running on port 5000"));
