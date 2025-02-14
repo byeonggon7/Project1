@@ -1,69 +1,58 @@
-const express = require("express");
-const rateLimit = require("express-rate-limit");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const cors = require("cors");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Welcome to My Blog</h1>
+    <p>Sign up or log in below:</p>
+    
+    <div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="signup()">Sign Up</button>
+        <button onclick="login()">Log In</button>
+    </div>
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+    <p id="message"></p>
 
-const users = {};
-const SECRET_KEY = process.env.SECRET_KEY || "supersecret";
+    <script>
+        const backendUrl = "https://project1-qahh.onrender.com";
 
-const failedAttempts = {};
+        async function signup() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
 
-const loginLimiter = rateLimit({
-    windowMs: 30 * 1000,
-    max: 5,
-    message: "Too many login attempts. Try again in 30 seconds.",
-    headers: true,
-});
+            const response = await fetch(`${backendUrl}/signup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
 
-app.post("/signup", async (req, res) => {
-    const { username, password } = req.body;
+            const data = await response.json();
+            document.getElementById("message").innerText = data.message;
+        }
 
-    if (users[username]) {
-        return res.status(400).json({ message: "Username already exists" });
-    }
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    users[username] = { password: hashedPassword };
+            const response = await fetch(`${backendUrl}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
 
-    res.json({ success: true, message: "Account created successfully!" });
-});
+            const data = await response.json();
+            document.getElementById("message").innerText = data.message;
 
-app.post("/login", loginLimiter, async (req, res) => {
-    const { username, password } = req.body;
-
-    if (!failedAttempts[username]) {
-        failedAttempts[username] = { count: 0, lastAttempt: Date.now() };
-    }
-
-    if (failedAttempts[username].count >= 5 && Date.now() - failedAttempts[username].lastAttempt < 30000) {
-        return res.status(429).json({ message: "Too many login attempts. Try again in 30 seconds." });
-    }
-
-    if (!users[username]) {
-        failedAttempts[username].count += 1;
-        failedAttempts[username].lastAttempt = Date.now();
-        return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const validPassword = await bcrypt.compare(password, users[username].password);
-    if (!validPassword) {
-        failedAttempts[username].count += 1;
-        failedAttempts[username].lastAttempt = Date.now();
-        return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    failedAttempts[username].count = 0;
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
-    res.json({ success: true, message: "Login successful", token });
-});
-
-app.get("/", (req, res) => {
-    res.send("Backend is running!");
-});
-
-app.listen(5000, () => console.log("Server running on port 5000"));
+            if (data.success) {
+                alert("Login successful!");
+            }
+        }
+    </script>
+</body>
+</html>
