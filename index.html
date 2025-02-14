@@ -112,6 +112,7 @@
                 <p>Posted on <strong>February 9, 2025</strong></p>
                 <p>Hello world! This is my first blog post. I'll be sharing my journey and thoughts here.</p>
             </article>
+            <button id="logoutBtn" onclick="logout()">Logout</button>
         </div>
     </main>
 
@@ -120,7 +121,11 @@
     </footer>
 
     <script>
-        const backendUrl = "https://project1-qahh.onrender.com";
+        const backendUrl = "https://project1-qahh.onrender.com"; // Change to "http://localhost:5050" for local testing
+
+        function sanitizeInput(input) {
+            return input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
 
         function showSignup() {
             document.getElementById("loginSection").style.display = "none";
@@ -133,15 +138,20 @@
         }
 
         window.onload = function() {
-            localStorage.removeItem("authToken");  
-            document.getElementById("loginSection").style.display = "block";
-            document.getElementById("blogContent").style.display = "none";
+            const token = localStorage.getItem("authToken");
+            if (token) {
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("blogContent").style.display = "block";
+            } else {
+                document.getElementById("loginSection").style.display = "block";
+                document.getElementById("blogContent").style.display = "none";
+            }
         };
 
         document.getElementById("signupForm").addEventListener("submit", async function(e) {
             e.preventDefault();
-            const username = document.getElementById("signupUsername").value;
-            const password = document.getElementById("signupPassword").value;
+            const username = sanitizeInput(document.getElementById("signupUsername").value);
+            const password = sanitizeInput(document.getElementById("signupPassword").value);
             
             const response = await fetch(`${backendUrl}/signup`, {
                 method: "POST",
@@ -160,8 +170,8 @@
 
         document.getElementById("loginForm").addEventListener("submit", async function(e) {
             e.preventDefault();
-            const username = document.getElementById("loginUsername").value;
-            const password = document.getElementById("loginPassword").value;
+            const username = sanitizeInput(document.getElementById("loginUsername").value);
+            const password = sanitizeInput(document.getElementById("loginPassword").value);
             
             const response = await fetch(`${backendUrl}/login`, {
                 method: "POST",
@@ -173,10 +183,16 @@
             document.getElementById("loginMessage").innerText = data.message;
 
             if (data.success) {
+                localStorage.setItem("authToken", data.token);
                 document.getElementById("loginSection").style.display = "none";
                 document.getElementById("blogContent").style.display = "block";
             }
         });
+
+        function logout() {
+            localStorage.removeItem("authToken");
+            location.reload();
+        }
     </script>
 
 </body>
