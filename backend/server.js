@@ -48,5 +48,9 @@ app.post("/login", loginLimiter, async (req, res) => {
     const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
     res.json({ success: true, message: "Login successful", token });
 });
+app.get("/", (req, res) => {
+    res.send("Backend is running!");
+});
+
 
 app.listen(5000, () => console.log("Server running on port 5000"));
