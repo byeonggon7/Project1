@@ -6,7 +6,6 @@
     <title>My Simple Blog</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Background with white and navy gradient */
         body {
             background: linear-gradient(to bottom, white, navy);
             color: white;
@@ -30,7 +29,6 @@
             background: rgba(0, 0, 50, 0.8);
         }
 
-        /* Form Styling */
         .form-container {
             max-width: 400px;
             margin: 20px auto;
@@ -63,12 +61,10 @@
             background-color: darkblue;
         }
 
-        /* Hide the blog content until login */
         .blog-container {
             display: none;
         }
 
-        /* Link to switch to Sign Up */
         .link {
             margin-top: 10px;
             color: navy;
@@ -88,7 +84,6 @@
     </header>
 
     <main>
-        <!-- Login Form (Default Page) -->
         <div id="loginSection" class="form-container">
             <h2>Login</h2>
             <form id="loginForm">
@@ -100,7 +95,6 @@
             <p class="link" onclick="showSignup()">Don't have an account? Sign up here</p>
         </div>
 
-        <!-- Sign-Up Form (Hidden by Default) -->
         <div id="signupSection" class="form-container" style="display: none;">
             <h2>Sign Up</h2>
             <form id="signupForm">
@@ -112,7 +106,6 @@
             <p class="link" onclick="showLogin()">Already have an account? Log in here</p>
         </div>
 
-        <!-- Blog Content (Hidden Until Login) -->
         <div id="blogContent" class="blog-container">
             <article>
                 <h2>This is My First Post!</h2>
@@ -127,21 +120,18 @@
     </footer>
 
     <script>
-        const backendUrl = "https://mybackend.onrender.com"; // Replace with your actual backend URL
+        const backendUrl = "https://project1-qahh.onrender.com";
 
-        // Show Sign-Up and Hide Login
         function showSignup() {
             document.getElementById("loginSection").style.display = "none";
             document.getElementById("signupSection").style.display = "block";
         }
 
-        // Show Login and Hide Sign-Up
         function showLogin() {
             document.getElementById("signupSection").style.display = "none";
             document.getElementById("loginSection").style.display = "block";
         }
 
-        // Handle Sign-Up
         document.getElementById("signupForm").addEventListener("submit", async function(e) {
             e.preventDefault();
             const username = document.getElementById("signupUsername").value;
@@ -162,7 +152,6 @@
             }
         });
 
-        // Handle Login
         document.getElementById("loginForm").addEventListener("submit", async function(e) {
             e.preventDefault();
             const username = document.getElementById("loginUsername").value;
@@ -184,7 +173,6 @@
             }
         });
 
-        // Check if User is Already Logged In
         window.onload = function() {
             const token = localStorage.getItem("authToken");
             if (token) {
