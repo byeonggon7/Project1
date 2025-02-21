@@ -1,0 +1,4 @@
+name = "cnproject"
+type = "javascript"
+main = "worker.js"
+compatibility_date = "2025-02-21"
