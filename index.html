@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Blog</title>
     <link rel="stylesheet" href="styles.css">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-WFNDXTD7HE');
+    </script>
 </head>
 <body>
     <header>
@@ -39,7 +47,9 @@
                 <h2>This is My First Post!</h2>
                 <p style="color:black;">Posted on <strong>February 9, 2025</strong></p>
                 <p style="color:black;">Hello! This is my first blog post.</p>
-                <img src="https://media.geeksforgeeks.org/wp-content/uploads/20230406152358/CN-(1).jpg" alt="Cloud Computing Illustration" loading="lazy" style="width:100%;max-width:600px;margin-top:20px;border-radius:8px;display:block;margin-left:auto;margin-right:auto;">
+                <img src="https://media.geeksforgeeks.org/wp-content/uploads/20230406152358/CN-(1).jpg" 
+                     alt="Cloud Computing Illustration" loading="lazy" 
+                     style="width:100%;max-width:600px;margin-top:20px;border-radius:8px;display:block;margin-left:auto;margin-right:auto;">
             </article>
             <button id="logoutBtn" onclick="logout()">Logout</button>
         </div>
@@ -51,7 +61,7 @@
 
     <script>
         const backendUrl="https://project1-qahh.onrender.com";
-        
+
         function sanitizeInput(e) {
             return e.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
@@ -104,7 +114,7 @@
             e.preventDefault();
             const username = sanitizeInput(document.getElementById("loginUsername").value);
             const password = sanitizeInput(document.getElementById("loginPassword").value);
-            
+
             const response = await fetch(`${backendUrl}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
