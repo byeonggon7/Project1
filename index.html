@@ -55,10 +55,16 @@
         </div>
     </main>
 
-    
+    <footer>
+        <p>© 2025 My Blog | All rights reserved.</p>
+    </footer>
 
     <script>
-        const backendUrl="https://project1-qahh.onrender.com";
+        const backendUrl = "https://project1-qahh.onrender.com";
+
+        let loginAttempts = 0;
+        const maxAttempts = 5;
+        const resetTime = 15 * 60 * 1000; // 15 minutes
 
         function sanitizeInput(e) {
             return e.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -110,6 +116,14 @@
 
         document.getElementById("loginForm").addEventListener("submit", async function(e) {
             e.preventDefault();
+            
+            if (loginAttempts >= maxAttempts) {
+                alert("Too many login attempts. Try again later.");
+                return;
+            }
+
+            loginAttempts++;
+
             const username = sanitizeInput(document.getElementById("loginUsername").value);
             const password = sanitizeInput(document.getElementById("loginPassword").value);
 
@@ -128,6 +142,10 @@
                 document.getElementById("signupSection").style.display = "none";
                 document.getElementById("blogContent").style.display = "block";
             }
+
+            setTimeout(() => {
+                loginAttempts = 0; // Reset after 15 minutes
+            }, resetTime);
         });
 
         function logout() {
