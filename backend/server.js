@@ -8,6 +8,10 @@ const admin = require("firebase-admin");
 
 const serviceAccount = JSON.parse(process.env.FIREBASE);
 
+if (serviceAccount.private_key) {
+    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+}
+
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
@@ -16,6 +20,7 @@ const db = admin.firestore();
 const usersCollection = db.collection("users");
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(cors());
 
