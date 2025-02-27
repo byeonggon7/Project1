@@ -5,8 +5,8 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { body, validationResult } = require("express-validator");
 const admin = require("firebase-admin");
-
 const path = require("path");
+
 const serviceAccount = require(path.join(__dirname, "serviceaccountkey.json"));
 
 admin.initializeApp({
@@ -15,6 +15,7 @@ admin.initializeApp({
 
 const db = admin.firestore();
 const usersCollection = db.collection("users");
+const postsCollection = db.collection("posts");
 
 const app = express();
 app.set('trust proxy', 1);
@@ -56,8 +57,8 @@ app.post(
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
             await userRef.set({ password: hashedPassword });
-            console.log("User successfully added to Firestore:", username);
 
+            console.log("User successfully added to Firestore:", username);
             res.json({ success: true, message: "Account created successfully!" });
         } catch (error) {
             console.error("Error writing to Firestore:", error);
@@ -69,7 +70,7 @@ app.post(
 app.post(
     "/login",
     loginLimiter,
-    [body("username").trim().escape(), body("password").escape()],
+    [body("username").trim().notEmpty(), body("password").notEmpty()],
     async (req, res) => {
         console.log("Login request received:", req.body);
 
@@ -91,20 +92,57 @@ app.post(
         }
 
         const userData = userDoc.data();
-        console.log("Stored user data:", userData);
+        console.log("Stored user data from Firestore:", userData);
 
         const validPassword = await bcrypt.compare(password, userData.password);
+        console.log("Password match result:", validPassword);
+
         if (!validPassword) {
             console.log("Password does not match for:", username);
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
         const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
-        console.log("Login successful for:", username);
+        console.log("Login successful for:", username, "| Token:", token);
 
         res.json({ success: true, message: "Login successful", token });
     }
 );
+
+app.post("/create-post", async (req, res) => {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const { title, content } = req.body;
+
+        if (!title || !content) return res.status(400).json({ message: "Title and content are required" });
+
+        await postsCollection.add({
+            username: decoded.username,
+            title,
+            content,
+            timestamp: new Date()
+        });
+
+        res.json({ success: true, message: "Post created successfully!" });
+    } catch (error) {
+        res.status(401).json({ message: "Invalid token" });
+    }
+});
+
+app.get("/posts", async (req, res) => {
+    try {
+        const snapshot = await postsCollection.orderBy("timestamp", "desc").get();
+        const posts = snapshot.docs.map(doc => doc.data());
+
+        res.json({ posts });
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving posts" });
+    }
+});
 
 app.get("/", (req, res) => {
     res.send("Backend is running!");
