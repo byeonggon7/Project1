@@ -5,8 +5,8 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { body, validationResult } = require("express-validator");
 const admin = require("firebase-admin");
-const path = require("path");
 
+const path = require("path");
 const serviceAccount = require(path.join(__dirname, "serviceaccountkey.json"));
 
 admin.initializeApp({
