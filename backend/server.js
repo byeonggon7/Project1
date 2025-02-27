@@ -37,19 +37,35 @@ app.post(
     "/signup",
     [body("username").trim().escape(), body("password").isLength({ min: 6 }).escape()],
     async (req, res) => {
+        console.log("Signup request received:", req.body);
+
         const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        if (!errors.isEmpty()) {
+            console.log("Validation errors:", errors.array());
+            return res.status(400).json({ errors: errors.array() });
+        }
 
         const { username, password } = req.body;
+        console.log("Checking if user exists:", username);
+
         const userRef = usersCollection.doc(username);
         const userDoc = await userRef.get();
 
-        if (userDoc.exists) return res.status(400).json({ message: "Username already exists" });
+        if (userDoc.exists) {
+            console.log("User already exists:", username);
+            return res.status(400).json({ message: "Username already exists" });
+        }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await userRef.set({ password: hashedPassword });
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await userRef.set({ password: hashedPassword });
+            console.log("User successfully added to Firestore:", username);
 
-        res.json({ success: true, message: "Account created successfully!" });
+            res.json({ success: true, message: "Account created successfully!" });
+        } catch (error) {
+            console.error("Error writing to Firestore:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
     }
 );
 
@@ -58,21 +74,36 @@ app.post(
     loginLimiter,
     [body("username").trim().escape(), body("password").escape()],
     async (req, res) => {
+        console.log("Login request received:", req.body);
+
         const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        if (!errors.isEmpty()) {
+            console.log("Validation errors:", errors.array());
+            return res.status(400).json({ errors: errors.array() });
+        }
 
         const { username, password } = req.body;
+        console.log("Checking user:", username);
+
         const userRef = usersCollection.doc(username);
         const userDoc = await userRef.get();
 
-        if (!userDoc.exists) return res.status(401).json({ message: "Invalid credentials" });
+        if (!userDoc.exists) {
+            console.log("User not found:", username);
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
 
         const userData = userDoc.data();
-        const validPassword = await bcrypt.compare(password, userData.password);
+        console.log("Stored user data:", userData);
 
-        if (!validPassword) return res.status(401).json({ message: "Invalid credentials" });
+        const validPassword = await bcrypt.compare(password, userData.password);
+        if (!validPassword) {
+            console.log("Password does not match for:", username);
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
 
         const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
+        console.log("Login successful for:", username);
 
         res.json({ success: true, message: "Login successful", token });
     }
