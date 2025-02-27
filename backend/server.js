@@ -32,7 +32,7 @@ const loginLimiter = rateLimit({
 
 app.post(
     "/signup",
-    [body("username").trim().escape(), body("password").isLength({ min: 6 }).escape()],
+    [body("username").trim().notEmpty(), body("password").isLength({ min: 6 }).notEmpty()],
     async (req, res) => {
         console.log("Signup request received:", req.body);
 
