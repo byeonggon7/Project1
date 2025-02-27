@@ -8,13 +8,21 @@
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WFNDXTD7HE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-  gtag('config', 'G-WFNDXTD7HE');
-</script>
+        // Enable Google Analytics tracking
+        gtag('config', 'G-WFNDXTD7HE', { 'debug_mode': true });
+
+        // Manually trigger a pageview event
+        gtag('event', 'page_view', { 
+            page_title: document.title,
+            page_path: window.location.pathname,
+            page_location: window.location.href
+        });
+    </script>
 
 
 </head>
